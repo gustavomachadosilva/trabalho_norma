@@ -1,0 +1,91 @@
+// limpa variável
+operation clear(A){
+ 1: if zero A then goto 0 else goto 2
+ 2: do dec A goto 1
+}
+
+// A:=A+B (soma não-destrutiva)
+operation soma(A,B,C){
+  1: if zero B then goto 5 else goto 2
+  2: do dec B goto 3
+  3: do inc A goto 4
+  4: do inc C goto 1
+  5: if zero C then goto 0 else goto 6
+  6: do dec C goto 7
+  7: do inc B goto 5
+}
+
+// A:=A+B (soma destrutiva)
+operation soma(A,B){
+  1: if zero B then goto 0 else goto 2
+  2: do dec B goto 3
+  3: do inc A goto 1
+}
+
+
+// A:=B usando C (atribuição não-destrutiva)
+operation load(A,B,C){
+  1: do clear(A) goto 2
+  2: do soma(A,B,C) goto 0
+}
+
+// A:=B (atribuição destrutiva)
+operation load(A,B){
+  1: do clear(A) goto 2
+  2: do soma(A,B) goto 0
+}
+
+// A:=A-B usando C (subtração conservativa) 
+operation subtrai(A,B,C){ 
+    1: do load(C,B) goto 2 
+    2: if zero C then goto 0 else goto 3 
+    3: do dec C goto 4 
+    4: do inc B goto 5 
+    5: do dec A goto 2 
+}
+
+//tests if A < B
+test lessThan(A,B,C,D,E) {
+    1: do load(C,A,E) goto 2
+    2: do load(D,B,E) goto 3
+    3: if zero C then goto 6 else goto 4
+    4: do dec C goto 5
+    5: do dec D goto 3
+    6: if zero D then goto false else goto 7
+    7: do clear(D) goto true
+} 
+
+// tests if A is divisible by B
+test test_A_divBy_B(A,B,C,D,E,F) {
+    1: if zero B then goto false else goto 2
+    2: if zero A then goto true else goto 3
+    3: do load(C,A,D) goto 4
+    4: if lessThan(B,C,D,E,F) then goto 5 else goto 6
+    5: do subtrai(C,B,D) goto 4
+    6: if lessThan(C,B,D,E,F) then goto false else goto true
+    7: do clear(C) goto false
+    8: do clear(C) goto true
+}
+
+// complementa prime
+operation prime_complemnt(A,B,C,D,E,F,G) {
+    1: if test_A_divBy_B(A,B,D,E,F,G) then goto 2 else goto 3
+    2: do inc C goto 3
+    3: do dec B goto 0
+}
+
+// tests if A is prime
+test prime(A,B,C,D,E,F,G) {
+    1: do load(B,A,D) goto 2
+    2: do clear(C) goto 3
+    3: if zero B then goto 5 else goto 4
+    4: do prime_complemnt(A,B,C,D,E,F,G) goto 3
+    5: if cmp C 2 then goto 6 else goto 7
+    6: do clear(C) goto true
+    7: do clear(C) goto false
+}
+
+main {
+    1: if prime(X,B,C,D,E,F,G) then goto 2 else goto 0
+    2: do inc Y goto 0
+}
