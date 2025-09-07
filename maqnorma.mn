@@ -1,0 +1,118 @@
+
+operation zerar(A){ 
+    1: if zero A then goto 0 else goto 2 
+    2: do dec A goto 1 
+} 
+
+// A:=A+B usando C (soma conservative) 
+operation soma(A,B,C){
+    1: if zero B then goto 5 else goto 2 
+    2: do dec B goto 3 
+    3: do inc A goto 4 
+    4: do inc C goto 1 
+    5: if zero C then goto 0 else goto 6
+    6: do dec C goto 7 
+    7: do inc B goto 5 
+} 
+// A:=B usando C (atribuição conservativa) 
+operation atribui(A,B,C){ 
+    1: do zerar(A) goto 2 
+    2: do soma(A,B,C) goto 0 
+}
+
+// A:=A-B usando C (subtração conservativa) 
+operation subtrai(A,B,C){ 
+    1: do atribui(C,B,AUX_1) goto 2 
+    2: if zero C then goto 0 else goto 3 
+    3: do dec C goto 4 
+    4: do inc B goto 5 
+    5: do dec A goto 2 
+}
+
+// testa se A = B usando COPY_R1, COPY_R2, AUX 
+test igual(R1, R2, COPY_R1, COPY_R2, AUX) { 
+    1: do atribui(COPY_R1, R1, AUX) goto 2 
+    2: do atribui(COPY_R2, R2, AUX) goto 3 
+    3: if zero COPY_R1 then goto 4 else goto 5 
+    4: if zero COPY_R2 then goto true else goto 8 
+    5: if zero COPY_R2 then goto 9 else goto 6 
+    6: do dec COPY_R1 goto 7 
+    7: do dec COPY_R2 goto 3 
+    8: do zerar (COPY_R2) goto false 
+    9: do zerar(COPY_R1) goto false
+}
+
+
+// A>=B usando C,D,E (retorna true se A>=B e false caso contrário) 
+test maior_ou_igual(A,B,C,D,E){ 
+    1: do atribui(C,A,E) goto 2 
+    2: do atribui(D,B,E) goto 3 
+    3: if zero D then goto 4 else goto 5
+    4: do zerar(C) goto true 
+    5: if zero C then goto 6 else goto 7 
+    6: do zerar(D) goto false 
+    7: do dec C goto 8 
+    8: do dec D goto 3
+}
+
+operation div_mod(A,B,Q,R,COPY_A, COPY_B, AUX1, AUX2, AUX3) {
+    // Zerar Q e R
+    1: do zerar(Q) goto 2
+    2: do zerar(R) goto 3
+    
+    // Copiar A para COPY_A (o dividendo)
+    3: do atribui(COPY_A,A,AUX1) goto 4
+    
+    // Loop principal de divisão
+    4: do atribui(COPY_B,B,AUX1) goto 5
+    5: if maior_ou_igual(COPY_A, COPY_B, AUX1, AUX2 , AUX3) then goto 6 else goto 8
+    
+    // Subtrair B de A e incrementar Q
+    6: do subtrai(COPY_A, COPY_B, AUX1) goto 7
+    7: do inc Q goto 4 
+    
+    // Atribuir o resto para R
+    8: do atribui(R, COPY_A, AUX1) goto 0
+}
+
+operation div3(A,C){
+  1: do atribui(C,A,B) goto 2
+  2: if zero C then goto 0 else goto 3
+  3: do dec C goto 4
+  4: if zero C then goto 0 else goto 5
+  5: do dec C goto 6
+  6: if zero C then goto 0 else goto 7
+  7: do dec C goto 8
+  8: do inc A goto 2
+}
+
+// A divisivel_por_3 usando C (teste se múltiplo de 3)
+test divBy3(A,C){
+  1: do atribui(C,A,B) goto 2
+  2: if zero C then goto true else goto 3
+  3: do dec C goto 4
+  4: do inc A goto 5
+  5: if zero C then goto false else goto 6
+  6: do inc A goto 7
+  7: do dec C goto 8
+  8: if zero C then goto false else goto 9
+  9: do dec C goto 10
+ 10: do inc A goto 2
+}
+
+
+main {
+
+    1: do atribui(A, X, AUX1) goto 2
+
+    2: do zerar(B) goto 3
+    3: do inc B goto 4
+    4: do inc B goto 5
+    5: do inc B goto 6
+
+    6: do div_mod(A, B, Q, R, AUX1, AUX2, AUX3, AUX4, AUX5) goto 7
+
+    // 4. Atribuir o resultado (o resto R) para o registrador de saída Y
+    7: do atribui(Y, R, AUX1) goto 0
+
+}
