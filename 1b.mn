@@ -1,0 +1,141 @@
+
+operation clear(A){
+ 1: if zero A then goto 0 else goto 2
+ 2: do dec A goto 1
+}
+
+operation soma(A,B,C){
+  1: if zero B then goto 5 else goto 2
+  2: do dec  B goto 3
+  3: do inc  A goto 4
+  4: do inc  C goto 1
+  5: if zero C then goto 0 else goto 6
+  6: do dec  C goto 7
+  7: do inc  B goto 5
+}
+
+operation somaDes(A,B){
+  1: if zero B then goto 0 else goto 2
+  2: do dec B goto 3
+  3: do inc A goto 1
+}
+
+operation loadDes(A,B){
+  1: do clear(A) goto 2
+  2: do somaDes(A,B) goto 0
+}
+
+
+operation load(A,B,C){
+  1: do clear(A) goto 2
+  2: do soma(A,B,C) goto 0
+}
+
+operation subtrai(A,B,C){ 
+    1: do loadDes(C,B) goto 2 
+    2: if zero C then goto 0 else goto 3 
+    3: do dec C goto 4 
+    4: do inc B goto 5 
+    5: do dec A goto 2 
+}
+
+
+operation multi(A, B, C, D, F){
+ 1: do load(D, B, C) goto 2
+ 2: do load(F, A, C) goto 3
+ 3: do dec D goto 4
+ 4: if zero D then goto 6 else goto 5
+ 5: do soma(A, F, C) goto 3
+ 6: do clear(F) goto 0
+}
+
+operation fatorial(A, B, C, D, E, F){
+ 1: do load(E, A, C) goto 2
+ 2: do dec E goto 3
+ 3: do multi(A, E, C, D, F) goto 4
+ 4: if zero E then goto 5 else goto 2
+ 5: do clear(E) goto 6
+ 6: do clear(D) goto 7 
+ 7: do clear(F) goto 8
+ 8: do clear(C) goto 0
+}
+
+test maior_ou_igual(A,B,C,D,E){ 
+    1: do load(C,A,E) goto 2 
+    2: do load(D,B,E) goto 3 
+    3: if zero D then goto 4 else goto 5
+    4: do clear(C) goto true 
+    5: if zero C then goto 6 else goto 7 
+    6: do clear(D) goto false 
+    7: do dec C goto 8 
+    8: do dec D goto 3
+}
+
+test igual(R1, R2, COPY_R1, COPY_R2, AUX) { 
+    1: do load(COPY_R1, R1, AUX) goto 2 
+    2: do load(COPY_R2, R2, AUX) goto 3 
+    3: if zero COPY_R1 then goto 4 else goto 5 
+    4: if zero COPY_R2 then goto true else goto 8 
+    5: if zero COPY_R2 then goto 9 else goto 6 
+    6: do dec COPY_R1 goto 7 
+    7: do dec COPY_R2 goto 3 
+    8: do clear(COPY_R2) goto false 
+    9: do clear(COPY_R1) goto false
+}
+
+operation div_mod(A,B,Q,R,COPY_A, COPY_B, AUX1, AUX2, AUX3) {
+    1: do load(COPY_A,A,AUX1) goto 2 
+    2: do load(COPY_B,B,AUX1) goto 3 
+    3: if maior_ou_igual(COPY_A, COPY_B, AUX1, AUX2 , AUX3) then goto 4 else goto 6 
+    4: do subtrai(COPY_A, COPY_B, AUX1) goto 5 
+    5: do inc Q goto 3 
+    6: do loadDes(R, COPY_A) goto 7 
+    7: do clear(COPY_B) goto 0
+}
+
+operation div(A, B, Q, COPY, TMP) {
+    1: do clear(Q) goto 2
+    2: if zero B then goto 0 else goto 3
+    3: if zero A then goto 0 else goto 4
+    4: do load(COPY, B, TMP) goto 5
+    5: do dec A goto 6
+    6: do dec COPY goto 7
+    7: if zero COPY then goto 8 else goto 5
+    8: do inc Q goto 9
+    9: if zero A then goto 0 else goto 4
+}
+
+
+operation corta_numeros(A,B,C,D,E,F,G,H,I){
+ 1: do load(D, B, C) goto 2
+ 2: do dec D goto 3
+ 3: if igual(A, D, C, E, F) then goto 5 else goto 4
+ 4: do multi(B, D, G, H, I) goto 2 
+ 5: do clear(C) goto 6
+ 6: do clear(D) goto 7
+ 7: do clear(E) goto 8
+ 8: do clear(F) goto 9
+ 9: do clear(G) goto 10
+ 10: do clear(H) goto 11
+ 11: do clear(I) goto 0
+}
+
+operation combinatorio_8(A,B,C,D,E,F,G,H,I){
+ 1: do denominador(A, B, C, D, E, F, G) goto 2
+ 2: do clear(B) goto 3
+ 3: do add B 40320 goto 4
+ 4: do div_mod(B,A,C,D,E,F,G,H) goto 0
+}
+
+main{
+ 1: do add A 8 goto 2
+ 2: do load(B, A, C) goto 3
+ 3: do subtrai(A, X, C) goto 4
+ 4: if zero X then goto 6 else goto 5
+ 5: if zero A then goto 6 else goto 7
+ 6: do add Y 1 goto 0
+ 7: do corta_numeros(A, B, C, D, E, F, G, H, I) goto 8
+ 8: do fatorial(X, C, D, E, F, G) goto 9
+ 9: do div(B, X, C, D, E) goto 10
+ 10: do loadDes(Y, C) goto 0
+}
