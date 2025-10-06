@@ -1,0 +1,26 @@
+let
+
+  true = \a b. a;
+  false = \a b. b;  
+  if = \c. \a. \b. c a b;
+  not = \p. p false true;
+  isZero = \n. n (\x. false) true;
+  isPos = \n. not (isZero n);
+  succ = \n f x. f (n f x);
+  soma = \a b. a succ b;
+  mult = \a b. a (soma b) 0;
+  pair = \a b c. c a b;
+  fst = \p. p true;
+  snd = \p. p false;
+  shiftinc = \p. pair (snd p) (succ(snd p));
+  pred = \n. fst (n shiftinc (pair (0 0)));
+  sub = \a b. b pred a;
+  menor = \a b. isPos (sub a b);
+
+  menorIgual = \a b. if (isPos (sub a b)) false true;
+  somaFrac = \p1 p2. pair (soma (mult (fst p1) (snd p2)) (mult (snd p1) (fst p2))) 
+                          (mult (snd p1) (snd p2));
+
+in 
+
+somaFrac (pair 1 1) (pair 2 2)
