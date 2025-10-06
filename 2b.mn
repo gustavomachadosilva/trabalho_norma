@@ -1,0 +1,167 @@
+operation clear(A){
+  1: if zero A then goto 0 else goto 2
+  2: do dec A goto 1
+}
+
+// A:=A+B (soma destrutiva)
+operation soma(A,B){
+  1: if zero B then goto 0 else goto 2
+  2: do dec B goto 3
+  3: do inc A goto 1
+}
+
+// A:=A+B (soma não-destrutiva)
+operation soma(A,B,C){
+  1: if zero B then goto 5 else goto 2
+  2: do dec B goto 3
+  3: do inc A goto 4
+  4: do inc C goto 1
+  5: if zero C then goto 0 else goto 6
+  6: do dec C goto 7
+  7: do inc B goto 5
+}
+
+// A:=B (atribuição destrutiva)
+operation load(A,B){
+  1: do clear(A) goto 2
+  2: do soma(A,B) goto 0
+}
+
+// A:=B usando C (atribuição não-destrutiva)
+operation load(A,B,C){
+  1: do clear(A) goto 2
+  2: do soma(A,B,C) goto 0
+}
+
+// A:=A div 2 usando C (divisão inteira por 2)
+operation div2(A,C){
+  1: do load(C,A) goto 2
+  2: if zero C then goto 0 else goto 3
+  3: do dec C goto 4
+  4: if zero C then goto 0 else goto 5
+  5: do dec C goto 6
+  6: do inc A goto 2
+}
+
+// A divisivel_por_2 usando C (teste se multiplo de 2)
+test divBy2(A,C){
+  1: do load(C,A) goto 2
+  2: if zero C then goto true else goto 3
+  3: do dec C goto 4
+  4: do inc A goto 5
+  5: if zero C then goto false else goto 6
+  6: do inc A goto 7
+  7: do dec C goto 2
+}
+
+// A:=A*B usando C,D,E (multiplicação não destrutiva)
+operation mult(A,B,C,D,E){
+  1: if zero A then goto 3 else goto 2
+  2: if zero B then goto 3 else goto 4
+  3: do clear(A) goto 0
+  4: do load(C,A,E) goto 5
+  5: do load(D,B,E) goto 6
+  6: do dec D goto 7
+  7: if zero D then goto 11 else goto 8
+  8: do soma(A,C,E) goto 9
+  9: do dec D goto 10
+  10: if zero D then goto 11 else goto 8
+  11: do clear(C) goto 0
+  
+}
+
+// A:=A^B usando C,D,E,F,G (potenciação não-destrutiva)
+operation exp(A,B,C,D,E,F,G){
+  1: if zero B then goto 2 else goto 4
+  2: do clear(A) goto 3
+  3: do inc A goto 0
+  4: do load(F,A,C) goto 5
+  5: do load(G,B,C) goto 6
+  6: do dec G goto 7
+  7: if zero G then goto 11 else goto 8
+  8: do mult(A,F,C,D,E) goto 9
+  9: do dec G goto 10
+  10: if zero G then goto 11 else goto 8
+  11: do clear(F) goto 0
+}
+
+// C:=cod(A,B,C,COPIA_A, COPIA_B, AUX) preservando A e B
+operation cod(A,B,C,COPIA_A,COPIA_B,R0,R1,R3,R4,R5,R6){
+  1: do load(COPIA_A,A,R0) goto 2
+  2: do load(COPIA_B,B,R0) goto 3
+  3: do add R1 2 goto 4
+  4: do mult(COPIA_B,R1,R2,R3,R4) goto 5
+  5: do inc COPIA_B goto 6
+  6: do exp(R1,COPIA_A,R2,R3,R4,R5,R6) goto 7
+  7: do mult(R1, COPIA_B, R2,R3,R4) goto 8
+  8: do load(C,R1) goto 9
+  9: do clear(COPIA_A) goto 10
+  10: do clear(COPIA_B) goto 0
+}
+
+// A:=fst(B) usando C,D (extrai o primeiro componente do par)
+operation fst(A,B,C,D){
+  1: do clear(A) goto 2
+  2: do load(C,B,D) goto 3
+  3: if divBy2(C,D) then goto 4 else goto 0
+  4: do div2(C,D) goto 5
+  5: do inc A goto 3
+}
+
+// A:=snd(B)
+operation snd(A,B,C){
+  1: do dec B goto 2
+  2: do div2(B,C) goto 3
+  3: do load(A,B) goto 0
+}
+
+// A,B:=decod(C);
+operation decod(A,B,C,R1,R2){
+  1: do fst(A,C,R1,R2) goto 2
+  2: do snd(B,R1,R2) goto 3
+}
+
+test maior_ou_igual(A,B,C,D,E){ 
+    1: do load(C,A,E) goto 2 
+    2: do load(D,B,E) goto 3 
+    3: if zero D then goto 4 else goto 5
+    4: do clear(C) goto true 
+    5: if zero C then goto 6 else goto 7 
+    6: do clear(D) goto false 
+    7: do dec C goto 8 
+    8: do dec D goto 3
+}
+
+test menor_que(A,B,C,D,E) {
+    1: do load(C,A,E) goto 2
+    2: do load(D,B,E) goto 3
+    3: if zero C then goto 6 else goto 4
+    4: do dec C goto 5
+    5: do dec D goto 3
+    6: if zero D then goto false else goto 7
+    7: do clear(D) goto true
+} 
+
+operation maxfirst(VAR_X, VAR_Y, R1, R2, R3, R4, R5, R6){
+ 1: if maior_ou_igual(VAR_X, VAR_Y, R1, R2, R3) then goto 8 else goto 2
+ 2: if menor_que(VAR_X, VAR_Y, R4, R5, R6) then goto 3 else goto 0
+ 3: do clear(R1) goto 4
+ 4: do clear(R2) goto 5
+ 5: do load(R1, VAR_X, R2) goto 6
+ 6: do load(VAR_X, VAR_Y, R2) goto 7
+ 7: do load(VAR_Y, R1, R2) goto 0
+ 8: do load(R1, VAR_Y, R2) goto 9
+ 9: do load(VAR_Y, VAR_X, R2) goto 10
+ 10: do load(VAR_X, R1, R2) goto 0
+}
+
+
+main{
+  1: do load(C,X,R0) goto 2
+  2: do decod(A,B,C,R0,R1) goto 3
+  3: do clear(R1) goto 4
+  4: do maxfirst(A, B, R1, R2, R3, R4, R5, R6) goto 5
+  5: do clear(C) goto 6
+  6: do cod(A, B, C, D, E, F, G, H, I, J, K) goto 7 
+  7: do load(Y, C) goto 0
+}

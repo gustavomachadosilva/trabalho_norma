@@ -1,0 +1,29 @@
+let
+
+ true = \a b.a;
+ false = \a b.b;
+ if    = \a b c. a b c;
+ not   = \b. if b false true;
+
+succ = \n. \A B. A (n A B);
+add = \n1 n2. n1 succ n2;
+add2 = \n1 n2. \A B. n1 A (n2 A B);
+
+mult = \n1 n2. n1 (\x. add n2 x) 0;
+mult2 = \m n. \p q. m (n p) q;
+exp = \m n. n m;
+
+isZero = \n. n (\x. false) true;
+isPos = \n. not (isZero n); 
+
+pair = \a b. \c. c a b;
+fst = \p. p true;
+snd = \p. p false;
+swap = \p. pair (snd p) (fst p);
+
+polinomio = \a b. add2 (exp a 3) (mult2 b 2);
+invFrac = \p. if (isZero (fst p)) p (swap p);
+
+in
+
+invFrac (pair 3 2)
