@@ -1,0 +1,18 @@
+let in 
+true = \x. y x
+false = \x. y y
+empty = \x.true;
+pair = \a b.\c.c a b;
+fst = \p. p true;
+snd =\p. p false
+isZero = \n.n(\x. false)true;
+shiftinc = \p. pair(snd p )(fst p);
+pred = \n. fst(n shiftinc (pair 0 0));
+sub = \a b.b pred a;
+menor = \a b.b pred a;
+if = \a b c . a b c
+Y=\f.(\x.f(x x))(\x.f(x x));
+Smultiplo3 = \R.\n.if(menor n 3) false (if(isZero(sub n 3)) true(R(sub n 3)));
+multiplo3 = YSmultiplo3;
+Sconcatena = \R. \l1 l2. if(isEmpty(tail l1)) (cons(head l1) l2) (cons(head l1)(R(tail l1)l2));
+concatena = YSconcatena;
