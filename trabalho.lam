@@ -4,6 +4,7 @@ let
  false = \a b.b;
  if    = \a b c. a b c;
  not   = \b. if b false true;
+not2 = \p. p false true;
 
 succ = \n. \A B. A (n A B);
 add = \n1 n2. n1 succ n2;
@@ -12,17 +13,64 @@ add2 = \n1 n2. \A B. n1 A (n2 A B);
 mult = \n1 n2. n1 (\x. add n2 x) 0;
 mult2 = \m n. \p q. m (n p) q;
 exp = \m n. n m;
+exp2 = \m n. n (mult m) 1;
 
 isZero = \n. n (\x. false) true;
-isPos = \n. not (isZero n); 
+isPos = \n. not (isZero n);
+isPos2 = \n. not2 (isZero n); 
 
 pair = \a b. \c. c a b;
 fst = \p. p true;
 snd = \p. p false;
 swap = \p. pair (snd p) (fst p);
 
+shiftinc = \p. pair(snd p )(fst p);
+shiftinc2 = \p. pair (snd p) (succ(snd p));
+pred = \n. fst(n shiftinc (pair 0 0));
+pred2 = \n. fst(n shiftinc2 (pair 0 0));
+sub = \a b.b pred a;
+sub2 = \a b.b pred2 a;
+menor = \a b.b pred a;
+menor2 = \a b. isPos (sub b a);
+
+empty = \x. true;
+cons = pair;
+
+isEmpty = \l. l (\a b. false);
+head = fst;
+tail = snd;
+
+um = \f x. f x;
+nil  = \c n. n;
+isNil = \l. l (\h t. false) true;
+
+Y = \f. (\x. f (x x)) (\x. f (x x));
+
 polinomio = \a b. add2 (exp a 3) (mult2 b 2);
 invFrac = \p. if (isZero (fst p)) p (swap p);
+
+Smultiplo3 = \R.\n. if (menor n 3) false (if (isZero (sub n 3)) true (R (sub n 3)));
+multiplo3 = Y Smultiplo3;
+Sconcatena = \R. \l1 l2. if(isEmpty(tail l1)) (cons(head l1) l2) (cons(head l1)(R(tail l1)l2));
+concatena = YSconcatena;
+
+menorIgual = \a b. if (isPos2 (sub2 a b)) false true;
+somaFrac = \p1 p2. pair (add2 (mult (fst p1) (snd p2)) (mult (snd p1) (fst p2))) 
+                        (mult (snd p1) (snd p2));
+
+S_div = \R a b.
+      if (menor2 a b)
+         0
+         (succ (R (sub a b) b));
+
+div = Y S_div;
+
+calcula = \a. add (exp2 2 (div a 2)) a;
+
+prodLista = 
+    Y (\f l. if (isNil l)
+               um
+               (mult (head l) (f (tail l))));
 
 in
 
