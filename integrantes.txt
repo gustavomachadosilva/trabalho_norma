@@ -1,4 +1,4 @@
-Trabalho Programação em Máquina de Registradores Norma
+Trabalho Programação em Cálculo Lambda
 Turma A
 
 Integrantes:
